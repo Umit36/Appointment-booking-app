@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <div class="fractal-background"></div>
+
+    <div id="login-container">
+        <h2>Admin Girişi</h2>
+        <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+        <input type="password" id="password" placeholder="Şifre" required><br>
+        <button id="login-button" class="button">Giriş Yap</button>
+        <p id="login-error" style="color:red;"></p>
+    </div>
+
+    <div id="admin-panel" style="display: none;">
+        <h1>Yönetim Paneli</h1>
+        <button id="logout-button" class="button">Çıkış Yap</button>
+
+        <h2>Kullanıcılar</h2>
+        <button id="show-users" class="button">Kullanıcıları Göster</button>
+        <div id="user-list" style="display: none;"></div>
+
+        <h2>Randevular</h2>
+        <button id="show-appointments" class="button">Randevuları Göster</button>
+        <div id="appointment-list" style="display: none;"></div>
+
+        <h2>Geri Bildirimler</h2>
+        <button id="show-feedback" class="button">Geri Bildirimleri Göster</button>
+        <div id="feedback-list" style="display: none;"></div>
+    </div>
+</body>
+<script>
+// Sağ tıklamayı engelleyen işlev
+document.addEventListener('contextmenu', function(e) {
+      e.preventDefault(); 
+  });
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "F12") {
+        event.preventDefault();
+    }
+});
+
+
+const loginButton = document.getElementById('login-button');
+const logoutButton = document.getElementById('logout-button');
+const showUsersButton = document.getElementById('show-users');
+const showAppointmentsButton = document.getElementById('show-appointments');
+const showFeedbackButton = document.getElementById('show-feedback');
+const userList = document.getElementById('user-list');
+const appointmentList = document.getElementById('appointment-list');
+const feedbackList = document.getElementById('feedback-list');
+const loginContainer = document.getElementById('login-container');
+const adminPanel = document.getElementById('admin-panel');
+const loginError = document.getElementById('login-error');
+
+let token = '';
+
+loginButton.addEventListener('click', async () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const response = await fetch('http://localhost:3000/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        token = data.token;
+        loginContainer.style.display = 'none';
+        adminPanel.style.display = 'block';
+
+        // Form alanlarını temizle
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    } else {
+        loginError.textContent = 'Giriş başarısız! Lütfen bilgilerinizi kontrol edin.';
+    }
+});
+
+logoutButton.addEventListener('click', () => {
+    token = '';
+    adminPanel.style.display = 'none';
+    loginContainer.style.display = 'block';
+});
+
+showUsersButton.addEventListener('click', async () => {
+    const response = await fetch('http://localhost:3000/api/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const users = await response.json();
+
+    if (userList.style.display === 'none') {
+        userList.innerHTML = `
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Ad</th>
+                    <th>Email</th>
+                    <th>Sil</th>
+                </tr>
+                ${users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td><button onclick="deleteUser(${user.id})">Sil</button></td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+        userList.style.display = 'block';
+    } else {
+        userList.style.display = 'none';
+    }
+});
+
+async function deleteUser(userId) {
+    const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+        showUsersButton.click(); // Kullanıcı listesini yenile
+    }
+}
+
+showAppointmentsButton.addEventListener('click', async () => {
+    const response = await fetch('http://localhost:3000/api/appointment', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const appointments = await response.json();
+
+    if (appointmentList.style.display === 'none') {
+        appointmentList.innerHTML = `
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Kullanıcı ID</th>
+                    <th>Ad</th>
+                    <th>Soyad</th>
+                    <th>Telefon</th>
+                    <th>Tarih</th>
+                    <th>Saat</th>
+                    <th>Mesaj</th>
+                    <th>Stil</th>
+                    <th>Sil</th>
+                </tr>
+                ${appointments.map(app => `
+                    <tr>
+                        <td>${app.id}</td>
+                        <td>${app.user_id}</td>
+                        <td>${app.name}</td>
+                        <td>${app.surname}</td>
+                        <td>${app.phone}</td>
+                        <td>${app.formatted_date}</td>
+                        <td>${app.time}</td>
+                        <td>${app.message}</td>
+                        <td>${app.style}</td>
+                        <td><button onclick="deleteAppointment(${app.id})">Sil</button></td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+        appointmentList.style.display = 'block';
+    } else {
+        appointmentList.style.display = 'none';
+    }
+});
+
+async function deleteAppointment(appointmentId) {
+    const response = await fetch(`http://localhost:3000/api/appointment/${appointmentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+        showAppointmentsButton.click(); // Randevu listesini yenile
+    }
+}
+
+showFeedbackButton.addEventListener('click', async () => {
+    const response = await fetch('http://localhost:3000/api/feedback', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const feedback = await response.json();
+
+    if (feedbackList.style.display === 'none') {
+        feedbackList.innerHTML = `
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Ad</th>
+                    <th>Puan</th>
+                    <th>Yorum</th>
+                    <th>Oluşturulma Tarihi</th>
+                    <th>Sil</th>
+                </tr>
+                ${feedback.map(fb => `
+                    <tr>
+                        <td>${fb.id}</td>
+                        <td>${fb.name}</td>
+                        <td>${fb.rating}</td>
+                        <td>${fb.comments}</td>
+                        <td>${new Date(fb.created_at).toLocaleDateString('tr-TR')}</td>
+                        <td><button onclick="deleteFeedback(${fb.id})">Sil</button></td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+        feedbackList.style.display = 'block';
+    } else {
+        feedbackList.style.display = 'none';
+    }
+});
+
+async function deleteFeedback(feedbackId) {
+    const response = await fetch(`http://localhost:3000/api/feedback/${feedbackId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+        showFeedbackButton.click(); // Geri bildirim listesini yenile
+    }
+}
+
+</script>
+</html>

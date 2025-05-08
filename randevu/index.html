@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css? family=Lato:100,300,400" rel="stylesheet">
+    <title>Randevu Alma Uygulaması</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="fractal-background"></div>
+
+    <button id="open-container" class="open-button button">Randevu Al</button>
+
+    <div class="container" id="appointment-container">
+        <button id="close-container" class="close-button">X</button>
+        <div class="li hidden" style="padding-top: 30px;" id="navigation-links">
+            <ul>
+                <a href="#appointment-section"><span>Randevu Al</span></a>
+                <a href="#appointments-section"><span>Randevularım</span></a>
+                <a href="#feedback-section"><span>Geri Bildirim</span></a>
+            </ul>
+        </div>
+        
+        <div class="auth-section" style="padding-top: 30px;">
+            <button id="register-btn" class="button">Kayıt Ol</button>
+            <button id="login-btn" class="button">Giriş Yap</button>
+            <button class="ortala button" id="logout-btn" class="hidden">Çıkış Yap</button>
+        </div>
+
+        <div id="registration-section" class="hidden">
+            <h2>Kayıt Ol</h2>
+            <form id="registration-form">
+                <label for="reg-name">Ad Soyad:</label>
+                <input type="text" id="reg-name" required>
+
+                <label for="reg-email">E-posta:</label>
+                <input type="email" id="reg-email" required>
+
+                <label for="reg-password">Şifre:</label>
+                <input type="password" id="reg-password" required>
+
+                <button type="submit" class="button" style="margin: 5px 15%; width: 70%;">Kayıt Ol</button>
+            </form>
+        </div>
+
+        <div id="login-section" class="hidden">
+            <h2>Giriş Yap</h2>
+            <form id="login-form">
+                <label for="login-email">E-posta:</label>
+                <input type="email" id="login-email" required>
+
+                <label for="login-password">Şifre:</label>
+                <input type="password" id="login-password" required>
+
+                <button type="submit" class="button" style="margin: 5px 15%; width: 70%;">Giriş Yap</button>
+            </form>
+        </div>
+
+        <div id="appointment-section" class="hidden">
+            <h2>Randevu Al</h2>
+            <form id="appointment-form">
+                <label for="name">Adınız:</label>
+                <input type="text" id="name" required>
+
+                <label for="surname">Soyadınız:</label>
+                <input type="text" id="surname" required>
+
+                <label for="phone">Telefon:</label>
+                <input type="tel" id="phone" required>
+
+                <label for="date">Randevu Tarihi:</label>
+                <input type="date" id="date" required>
+
+                <label for="time">Randevu Saati:</label>
+                <select id="time" required>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="12:00">12:00</option>
+                </select>
+
+                <label for="message">Mesaj:</label>
+                <textarea id="message"></textarea>
+
+                <label for="style">Saç Kesimi Stili:</label>
+                <select id="style" required>
+                    <option value="kısa">Kısa</option>
+                    <option value="orta">Orta</option>
+                    <option value="uzun">Uzun</option>
+                </select>
+
+                <button class="ortala button" type="submit">Randevu Al</button>
+            </form>
+        </div>
+
+        <div id="appointments-section" class="hidden">
+            <h2>Randevularım</h2>
+            <ul id="appointments-list"></ul>
+            
+            <form id="cancel-appointment-form">
+                <h2>Randevu İptal</h2>
+                <label for="cancel-id">Randevu ID:</label>
+                <input type="text" id="cancel-id" required>
+                <button class="ortala button" type="submit">Randevuyu İptal Et</button>
+            </form>
+        </div>
+    
+
+    <div id="feedback-section">
+        
+        <form id="feedback-form">
+            <h2>Geri Bildirim</h2>
+            <label for="feedback-name">Ad Soyad:</label>
+            <input type="text" id="feedback-name" required>
+    
+            <label for="feedback-rating">Puanlama:</label>
+            <select id="feedback-rating" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+    
+            <label for="feedback-comment">Yorum:</label>
+            <textarea id="feedback-comment" required></textarea>
+    
+            <button type="submit" class="ortala button">Gönder</button>
+        </form>
+    
+        <div id="feedback-list">
+            <h2>Tüm Geri Bildirimler</h2>
+            <table id="feedback-table">
+                <thead>
+                    <tr>
+                        <th style="color: black;">Ad Soyad</th>
+                        <th style="color: black;">Puan</th>
+                        <th style="color: black;">Yorum</th>
+                    </tr>
+                </thead>
+                <tbody id="feedback-items">
+                    <!-- Veritabanından gelen geri bildirimler burada listelenecek -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+// Sağ tıklamayı engelleyen işlev
+document.addEventListener('contextmenu', function(e) {
+      e.preventDefault(); 
+  });
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "F12") {
+        event.preventDefault();
+    }
+});
+
+
+    const navigationLinks = document.querySelectorAll('#navigation-links a');
+    
+    // Yumuşak kaydırma işlemi
+    navigationLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault(); // Varsayılan davranışı engelle
+    
+            const targetId = link.getAttribute('href'); // Hedef id'sini al
+            const targetElement = document.querySelector(targetId); // Hedef elementi bul
+    
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' }); // Hedef elemana yumuşak kaydır
+            }
+        });
+    });
+    
+    // Randevu konteynerini açma/gizleme
+    document.getElementById('open-container').addEventListener('click', () => {
+        const container = document.getElementById('appointment-container');
+        container.classList.toggle('show'); // Container'ı göster veya gizle
+        document.getElementById('open-container').classList.add('hidden'); // Randevu Al butonunu gizle
+    });
+    
+    document.getElementById('close-container').addEventListener('click', () => {
+        const container = document.getElementById('appointment-container');
+        container.classList.remove('show'); // Container'ı gizle
+        document.getElementById('open-container').classList.remove('hidden'); // Randevu Al butonunu göster
+    });
+    
+    // Sayfa yüklendiğinde token kontrolü
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('register-btn').classList.add('hidden');
+            document.getElementById('login-btn').classList.add('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+            document.getElementById('navigation-links').classList.remove('hidden');
+            document.getElementById('appointment-section').classList.remove('hidden');
+            document.getElementById('appointments-section').classList.remove('hidden');
+            document.getElementById('feedback-section').classList.remove('hidden'); // Geri bildirim bölümünü göster
+            fetchAppointments(); // Randevuları yükle
+            fetchFeedback(); // Geri bildirimleri yükle
+        } else {
+            document.getElementById('logout-btn').classList.add('hidden');
+            document.getElementById('navigation-links').classList.add('hidden');
+            document.getElementById('feedback-section').classList.add('hidden'); // Geri bildirim bölümünü gizle
+        }
+    });
+    
+    // Geri bildirim gönderme
+    document.getElementById('feedback-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('feedback-name').value.trim(); // Kullanıcı girişi için trim
+        const rating = document.getElementById('feedback-rating').value;
+        const comment = document.getElementById('feedback-comment').value.trim(); // Kullanıcı girişi için trim
+        const token = localStorage.getItem('token');
+    
+        if (!token) return alert('Lütfen giriş yapın.'); // Token yoksa işlem yapma
+    
+        fetch('http://localhost:3000/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name, rating, comment }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchFeedback(); // Geri bildirim gönderildikten sonra geri bildirimleri güncelle
+            document.getElementById('feedback-form').reset();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    // Geri bildirimleri yükle
+    function fetchFeedback() {
+        fetch('http://localhost:3000/api/feedback')
+            .then(response => response.json())
+            .then(data => {
+                const feedbackItems = document.getElementById('feedback-items');
+                feedbackItems.innerHTML = ''; // Önceki geri bildirimleri temizle
+                data.forEach(feedback => {
+                    const row = document.createElement('tr'); // Yeni bir satır oluştur
+                    row.innerHTML = `
+                        <td>${feedback.name || 'Anonim'}</td>
+                        <td>${feedback.rating}</td>
+                        <td>${feedback.comments || ''}</td>
+                    `;
+                    feedbackItems.appendChild(row); // Satırı tabloya ekle
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    
+    // Sayfa yüklendiğinde geri bildirimleri getir
+    document.addEventListener('DOMContentLoaded', fetchFeedback);
+    
+    // Kayıt ol butonu
+    document.getElementById('register-btn').addEventListener('click', () => {
+        document.getElementById('registration-section').classList.toggle('hidden');
+        document.getElementById('logout-btn').classList.add('hidden'); // Çıkış yap butonunu gizle
+        document.getElementById('navigation-links').classList.add('hidden');
+    });
+    
+    // Giriş yap butonu
+    document.getElementById('login-btn').addEventListener('click', () => {
+        document.getElementById('login-section').classList.toggle('hidden');
+        document.getElementById('logout-btn').classList.add('hidden'); // Çıkış yap butonunu gizle
+        document.getElementById('navigation-links').classList.add('hidden');
+        document.getElementById('feedback-section').classList.add('hidden'); // Geri bildirim bölümünü gizle
+    });
+    
+    // Kayıt formu gönderme
+    document.getElementById('registration-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+    
+        // Şifre doğrulama
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return alert('Şifre en az 8 karakterden oluşmalı, en az bir büyük harf, bir küçük harf, bir sayı ve bir özel karakter içermelidir.');
+        }
+        
+        // Basit e-posta doğrulama
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) return alert('Geçersiz e-posta adresi.');
+    
+        // Kayıt isteği
+        fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Zaten var olan bir hesabınız var.'); // Hesap mevcutsa uyarı
+            } else {
+                alert(data.message);
+                // Formu temizle
+                document.getElementById('registration-form').reset();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    // Giriş yap işlemi
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+    
+        if (!email || !password) return alert('E-posta ve şifre gerekli.');
+    
+        const loginData = { email, password };
+        fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(loginData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.token) {
+                alert(`Hoşgeldin ${data.name || "Misafir"} ${data.surname || ""}! Randevu alabilirsiniz.`);
+                localStorage.setItem('token', data.token); // Token'ı yerel depolamaya kaydet
+
+                // Formu temizle
+                document.getElementById('login-form').reset();
+    
+                document.getElementById('appointment-section').classList.remove('hidden');
+                document.getElementById('appointments-section').classList.remove('hidden');
+                document.getElementById('feedback-section').classList.remove('hidden'); // Geri bildirim bölümünü göster
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('register-btn').classList.add('hidden');
+                document.getElementById('login-btn').classList.add('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+                document.getElementById('navigation-links').classList.remove('hidden');
+    
+                // Kayıt ol bölümünü gizle
+                document.getElementById('registration-section').classList.add('hidden');
+    
+                fetchAppointments(); // Randevuları yükle
+            } else {
+                alert('Giriş başarısız! Lütfen bilgilerinizi kontrol edin.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    // Çıkış yap butonu
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('token'); // Token'ı sil
+        // Giriş ve kayıt alanlarını göster
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('register-btn').classList.remove('hidden'); // Kayıt ol butonunu göster
+        document.getElementById('login-btn').classList.remove('hidden'); // Giriş yap butonunu göster
+        // Diğer bölümleri gizle
+        document.getElementById('appointment-section').classList.add('hidden');
+        document.getElementById('appointments-section').classList.add('hidden'); // Randevularım kısmını gizle
+        document.getElementById('feedback-section').classList.add('hidden'); // Geri bildirim bölümünü gizle
+        document.getElementById('logout-btn').classList.add('hidden'); // Çıkış yap butonunu gizle
+        document.getElementById('navigation-links').classList.add('hidden');
+    });
+    
+    // Randevu formu gönderme
+    document.getElementById('appointment-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const surname = document.getElementById('surname').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const message = document.getElementById('message').value.trim();
+        const style = document.getElementById('style').value;
+        const token = localStorage.getItem('token');
+    
+        if (!token) return alert('Lütfen giriş yapın.'); // Token yoksa işlem yapma
+    
+        fetch('http://localhost:3000/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name, surname, phone, date, time, message, style }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchAppointments(); // Randevu alındıktan sonra randevuları güncelle
+            document.getElementById('appointment-form').reset();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    // Randevuları yükle
+    function fetchAppointments() {
+        const token = localStorage.getItem('token');
+        if (!token) return alert('Lütfen giriş yapın.'); // Token yoksa işlem yapma
+    
+        fetch('http://localhost:3000/api/appointments', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const appointmentsList = document.getElementById('appointments-list');
+            appointmentsList.innerHTML = '';
+            data.forEach(appointment => {
+                const li = document.createElement('li');
+                li.textContent = `ID: ${appointment.id} - ${appointment.date} ${appointment.time} - ${appointment.name || ''} ${appointment.surname || ''}`;
+                appointmentsList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    // Randevuyu iptal etme
+    document.getElementById('cancel-appointment-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const cancelId = document.getElementById('cancel-id').value.trim();
+        const token = localStorage.getItem('token');
+    
+        if (!token) return alert('Lütfen giriş yapın.'); // Token yoksa işlem yapma
+    
+        fetch(`http://localhost:3000/api/appointments/${cancelId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchAppointments(); // Randevuları güncelle
+            document.getElementById('cancel-appointment-form').reset();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    </script>
+    
+</html>

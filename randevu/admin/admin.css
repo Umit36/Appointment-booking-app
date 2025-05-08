@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.fractal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(45deg, #333 25%, transparent 25%) -50px 0/100px 100px,
+                linear-gradient(135deg, #333 25%, transparent 25%) -50px 0/100px 100px,
+                linear-gradient(45deg, transparent 75%, #111 75%) -50px 0/100px 100px,
+                linear-gradient(135deg, transparent 75%, #111 75%) -50px 0/100px 100px;
+    background-color: #222;
+    animation: animatePlaid 5s linear infinite;
+    z-index: -1;
+  }
+  
+  /* Fractal Plaid Animation */
+  @keyframes animatePlaid {
+    0% {
+      background-position: 0 0, 0 0, 0 0, 0 0;
+    }
+    100% {
+      background-position: 100px 100px, -100px 100px, 100px -100px, -100px -100px;
+    }
+  }
+
+#login-container{
+    max-width: 70%;
+    margin-left: 15%;
+}
+
+#login-container, #admin-panel {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    color: #fff;
+}
+
+#user-list, #appointment-list, #feedback-list{
+    overflow-x: auto; /* Yatay kaydırma çubuğu ekle */
+    white-space: nowrap; /* İçeriğin satır atlamasını engelle */
+    width: 100%; /* Genişliği ayarlayın */
+}
+
+h1, h2 {
+    margin-bottom: 10px;
+    background:linear-gradient(90deg, #00ffff, #ff00c3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+input {
+    width: 50%;
+    padding: 10px;
+    border: 1px solid aliceblue;
+    background-color: rgba(0, 0, 0, 0.5); 
+    border-radius: 4px;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.button {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 2rem;
+    background:linear-gradient(90deg, #00ffff, #ff00c3);
+    color: white;
+    cursor: pointer;
+    width: 48%;
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background: #fff;
+    box-shadow: 0px 2px 20px 10px #97B1BF;
+    color: #000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+    color: #000;
+}
+.toggle-button {
+    margin-top: 20px;
+    cursor: pointer;
+}
